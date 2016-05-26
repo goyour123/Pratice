@@ -1,7 +1,7 @@
 import sqlite3
 import re
 
-conn = sqlite3.connect('emaildb.sqlite')
+conn = sqlite3.connect('target/emaildb.sqlite')
 cur = conn.cursor()
 
 cur.execute('''
@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS Counts''')
 cur.execute('''
 CREATE TABLE Counts (org TEXT, count INTEGER)''')
 
-fname = raw_input('Enter file name: ')
+fname = raw_input('Enter file locatin: ')
 if ( len(fname) < 1 ) : fname = 'mbox-short.txt'
 fh = open(fname)
 for line in fh:
