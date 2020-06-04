@@ -1,5 +1,7 @@
 #
 desktop.ini
 
-#PyCharm Project
+
+# Editor specific
+.vscode/
 .idea/
