@@ -5,3 +5,6 @@ desktop.ini
 # Editor specific
 .vscode/
 .idea/
+
+# User specific
+venv/
