@@ -1,3 +1,4 @@
+import sys
 import numpy
 import matplotlib
 matplotlib.use("Qt5Agg")
@@ -6,7 +7,7 @@ from PyQt5 import QtCore, QtWidgets
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 from sklearn import datasets
-import sys
+from pla_ui import Ui_MainWindow
 
 class MplCanvas(FigureCanvasQTAgg):
 
@@ -46,8 +47,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        sc = MplCanvas(self, width=10, height=9, dpi=100)
-        self.setCentralWidget(sc)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        self.sc = MplCanvas(self, width=10, height=9, dpi=100)
+        self.ui.verticalLayout.addWidget(self.sc)
         self.setWindowTitle("Iris")
         self.show()
 
