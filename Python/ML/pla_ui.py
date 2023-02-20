@@ -27,10 +27,19 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 753, 21))
         self.menubar.setObjectName("menubar")
+        self.menuSelect = QtWidgets.QMenu(self.menubar)
+        self.menuSelect.setObjectName("menuSelect")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.actionIris_Sepel = QtWidgets.QAction(MainWindow)
+        self.actionIris_Sepel.setObjectName("actionIris_Sepel")
+        self.actionIris_Petal = QtWidgets.QAction(MainWindow)
+        self.actionIris_Petal.setObjectName("actionIris_Petal")
+        self.menuSelect.addAction(self.actionIris_Sepel)
+        self.menuSelect.addAction(self.actionIris_Petal)
+        self.menubar.addAction(self.menuSelect.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -38,3 +47,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.menuSelect.setTitle(_translate("MainWindow", "Select"))
+        self.actionIris_Sepel.setText(_translate("MainWindow", "Iris Sepel"))
+        self.actionIris_Petal.setText(_translate("MainWindow", "Iris Petal"))

@@ -35,8 +35,26 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuSelect">
+    <property name="title">
+     <string>Select</string>
+    </property>
+    <addaction name="actionIris_Sepel"/>
+    <addaction name="actionIris_Petal"/>
+   </widget>
+   <addaction name="menuSelect"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionIris_Sepel">
+   <property name="text">
+    <string>Iris Sepel</string>
+   </property>
+  </action>
+  <action name="actionIris_Petal">
+   <property name="text">
+    <string>Iris Petal</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

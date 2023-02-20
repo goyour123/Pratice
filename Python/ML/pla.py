@@ -13,35 +13,32 @@ class MplCanvas(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, width=7, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi, linewidth=1)
-        self.axes = fig.add_subplot(211)
-        self.axes2 = fig.add_subplot(212)
+        self.axes = fig.add_subplot(111)
 
-        iris = datasets.load_iris()
-        iris_classes = ['Setosa', 'Versicolour', 'Virginica']
-        marker_color = ['blue', 'red', 'green']
-        instances_num = int(len(iris['data']) / len(iris_classes))
-
-        for idx, iris_class in enumerate(iris_classes):
-            sepel_len = [d[0] for d in iris['data'][instances_num*idx:instances_num*(idx+1)]]
-            sepel_width = [d[1] for d in iris['data'][instances_num*idx:instances_num*(idx+1)]]
-            self.axes.scatter(sepel_len, sepel_width, color=marker_color[idx], marker='x', label=iris_class)
-
-        self.axes.set_xlabel('Sepel Length')
-        self.axes.set_ylabel('Sepel Width')
-        self.axes.legend()
-
-
-        for idx, iris_class in enumerate(iris_classes):
-            petal_len = [d[2] for d in iris['data'][instances_num*idx:instances_num*(idx+1)]]
-            petal_width = [d[3] for d in iris['data'][instances_num*idx:instances_num*(idx+1)]]
-            self.axes2.scatter(petal_len, petal_width, color=marker_color[idx], marker='x',  label=iris_class)
-
-        self.axes2.set_xlabel('Petal Length')
-        self.axes2.set_ylabel('Petal Width')
-        self.axes2.legend()
+        self.iris = datasets.load_iris()
+        self.iris_classes = ['Setosa', 'Versicolour', 'Virginica']
+        self.marker_color = ['blue', 'red', 'green']
+        self.instances_num = int(len(self.iris['data']) / len(self.iris_classes))
+        self.iris_attr_idx = {
+            'Sepel': (0, 1),
+            'Petal': (2, 3)
+        }
 
         super(MplCanvas, self).__init__(fig)
+        self.iris_plot('Sepel')
 
+    def iris_plot(self, attr_name):
+        self.axes.cla()
+        len_idx, width_idx = self.iris_attr_idx[attr_name]
+        for idx, iris_class in enumerate(self.iris_classes):
+            sepel_len = [d[len_idx] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
+            sepel_width = [d[width_idx] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
+            self.axes.scatter(sepel_len, sepel_width, color=self.marker_color[idx], marker='x', label=iris_class)
+
+        self.axes.set_xlabel(f'{attr_name} Length')
+        self.axes.set_ylabel(f'{attr_name} Width')
+        self.axes.legend()
+        self.draw()
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -53,7 +50,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sc = MplCanvas(self, width=10, height=9, dpi=100)
         self.ui.verticalLayout.addWidget(self.sc)
         self.setWindowTitle("Iris")
+        self.ui.actionIris_Sepel.triggered.connect(self.show_iris_sepel)
+        self.ui.actionIris_Petal.triggered.connect(self.show_iris_petal)
         self.show()
+
+    def show_iris_sepel(self):
+        self.sc.iris_plot('Sepel')
+
+    def show_iris_petal(self):
+        self.sc.iris_plot('Petal')
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
