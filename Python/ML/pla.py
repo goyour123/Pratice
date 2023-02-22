@@ -25,15 +25,16 @@ class MplCanvas(FigureCanvasQTAgg):
         }
 
         super(MplCanvas, self).__init__(fig)
-        self.iris_plot('Sepel')
 
-    def iris_plot(self, attr_name):
+    def iris_plot(self, iris_class, attr_name):
         self.axes.cla()
         len_idx, width_idx = self.iris_attr_idx[attr_name]
-        for idx, iris_class in enumerate(self.iris_classes):
+        for idx, c in enumerate(self.iris_classes):
+            if idx != 0 and iris_class != c:
+                continue
             sepel_len = [d[len_idx] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
             sepel_width = [d[width_idx] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
-            self.axes.scatter(sepel_len, sepel_width, color=self.marker_color[idx], marker='x', label=iris_class)
+            self.axes.scatter(sepel_len, sepel_width, color=self.marker_color[idx], marker='x', label=c)
 
         self.axes.set_xlabel(f'{attr_name} Length')
         self.axes.set_ylabel(f'{attr_name} Width')
@@ -44,21 +45,25 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
+        self.setWindowTitle("Iris")
+
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
         self.sc = MplCanvas(self, width=10, height=9, dpi=100)
         self.ui.verticalLayout.addWidget(self.sc)
-        self.setWindowTitle("Iris")
+
         self.ui.actionIris_Sepel.triggered.connect(self.show_iris_sepel)
         self.ui.actionIris_Petal.triggered.connect(self.show_iris_petal)
+        self.ui.comboBox.addItems(self.sc.iris_classes[1:3])
+
+        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Sepel')
         self.show()
 
     def show_iris_sepel(self):
-        self.sc.iris_plot('Sepel')
+        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Sepel')
 
     def show_iris_petal(self):
-        self.sc.iris_plot('Petal')
+        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Petal')
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
