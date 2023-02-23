@@ -9,32 +9,38 @@ from matplotlib.figure import Figure
 from sklearn import datasets
 from pla_ui import Ui_MainWindow
 
+
+class IrisDataset ():
+    def __init__ (self):
+        self.iris = datasets.load_iris()
+        self.iris_classes = ['Setosa', 'Versicolour', 'Virginica']
+        self.instances_num = int(len(self.iris['data']) / len(self.iris_classes))
+
+        self.iris_scatter_dict = {}
+        for idx, c in enumerate(self.iris_classes):
+            sepel_len = [d[0] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
+            sepel_width = [d[1] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
+            petal_len = [d[2] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
+            petal_width = [d[3] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
+            self.iris_scatter_dict.update({c: {'sepel_len': sepel_len, 'sepel_width': sepel_width, 'petal_len': petal_len, 'petal_width': petal_width}})
+
 class MplCanvas(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, width=7, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi, linewidth=1)
         self.axes = fig.add_subplot(111)
-
-        self.iris = datasets.load_iris()
-        self.iris_classes = ['Setosa', 'Versicolour', 'Virginica']
-        self.marker_color = ['blue', 'red', 'green']
-        self.instances_num = int(len(self.iris['data']) / len(self.iris_classes))
-        self.iris_attr_idx = {
-            'Sepel': (0, 1),
-            'Petal': (2, 3)
-        }
-
+        self.iris_dataset = IrisDataset()
+        self.marker_color = ['blue', 'green', 'red']
         super(MplCanvas, self).__init__(fig)
 
     def iris_plot(self, iris_class, attr_name):
         self.axes.cla()
-        len_idx, width_idx = self.iris_attr_idx[attr_name]
-        for idx, c in enumerate(self.iris_classes):
-            if idx != 0 and iris_class != c:
-                continue
-            sepel_len = [d[len_idx] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
-            sepel_width = [d[width_idx] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
-            self.axes.scatter(sepel_len, sepel_width, color=self.marker_color[idx], marker='x', label=c)
+        attr_len, attr_width = attr_name.lower() + '_len', attr_name.lower() + '_width'
+        length, width = self.iris_dataset.iris_scatter_dict['Setosa'][attr_len], self.iris_dataset.iris_scatter_dict['Setosa'][attr_width]
+        self.axes.scatter(length, width, color=self.marker_color[0], marker='x', label='Setosa')
+
+        length, width = self.iris_dataset.iris_scatter_dict[iris_class][attr_len], self.iris_dataset.iris_scatter_dict[iris_class][attr_width]
+        self.axes.scatter(length, width, color=self.marker_color[1], marker='x', label=iris_class)
 
         self.axes.set_xlabel(f'{attr_name} Length')
         self.axes.set_ylabel(f'{attr_name} Width')
@@ -54,9 +60,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.actionIris_Sepel.triggered.connect(self.show_iris_sepel)
         self.ui.actionIris_Petal.triggered.connect(self.show_iris_petal)
-        self.ui.comboBox.addItems(self.sc.iris_classes[1:3])
+        self.ui.comboBox.addItems(self.sc.iris_dataset.iris_classes[1:3])
 
-        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Sepel')
+        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Petal')
         self.show()
 
     def show_iris_sepel(self):
