@@ -16,13 +16,15 @@ class IrisDataset ():
         self.iris_classes = ['Setosa', 'Versicolour', 'Virginica']
         self.instances_num = int(len(self.iris['data']) / len(self.iris_classes))
 
-        self.iris_scatter_dict = {}
+        self.iris_scatter_dict, self.iris_dataset_dict = {}, {'sepel': {}, 'petal': {}}
         for idx, c in enumerate(self.iris_classes):
             sepel_len = [d[0] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
             sepel_width = [d[1] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
             petal_len = [d[2] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
             petal_width = [d[3] for d in self.iris['data'][self.instances_num * idx:self.instances_num * (idx + 1)]]
             self.iris_scatter_dict.update({c: {'sepel_len': sepel_len, 'sepel_width': sepel_width, 'petal_len': petal_len, 'petal_width': petal_width}})
+            self.iris_dataset_dict['sepel'].update({c: list(zip(sepel_len, sepel_width))})
+            self.iris_dataset_dict['petal'].update({c: list(zip(petal_len, petal_width))})
 
 class MplCanvas(FigureCanvasQTAgg):
 
@@ -31,21 +33,31 @@ class MplCanvas(FigureCanvasQTAgg):
         self.axes = fig.add_subplot(111)
         self.iris_dataset = IrisDataset()
         self.marker_color = ['blue', 'green', 'red']
+        self.select_class = []
+        self.select_attr = ''
+        self._perceptron_count = 0
         super(MplCanvas, self).__init__(fig)
 
     def iris_plot(self, iris_class, attr_name):
         self.axes.cla()
-        attr_len, attr_width = attr_name.lower() + '_len', attr_name.lower() + '_width'
+        self._perceptron_count = 0
+        self.select_class = ['Setosa', iris_class]
+        self.select_attr = attr_name
+
+        attr_len, attr_width = self.select_attr.lower() + '_len', self.select_attr.lower() + '_width'
         length, width = self.iris_dataset.iris_scatter_dict['Setosa'][attr_len], self.iris_dataset.iris_scatter_dict['Setosa'][attr_width]
         self.axes.scatter(length, width, color=self.marker_color[0], marker='x', label='Setosa')
 
         length, width = self.iris_dataset.iris_scatter_dict[iris_class][attr_len], self.iris_dataset.iris_scatter_dict[iris_class][attr_width]
         self.axes.scatter(length, width, color=self.marker_color[1], marker='x', label=iris_class)
 
-        self.axes.set_xlabel(f'{attr_name} Length')
-        self.axes.set_ylabel(f'{attr_name} Width')
+        self.axes.set_xlabel(f'{self.select_attr} Length')
+        self.axes.set_ylabel(f'{self.select_attr} Width')
         self.axes.legend()
         self.draw()
+
+    def perceptron_plot(self):
+        self._perceptron_count += 1
 
 class MainWindow(QtWidgets.QMainWindow):
 
