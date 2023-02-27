@@ -62,24 +62,32 @@ class MplCanvas(FigureCanvasQTAgg):
         self.draw()
 
     def check_sign(self, w):
-        c = 0
+        err_count, err_list = 0, []
         for p, sign in self.current_dataset:
             t = (p[0] - self.org_x, p[1] - self.org_y)
             t_sign = numpy.sign(numpy.dot(numpy.array(w), numpy.array(t)))
-            if t_sign == numpy.sign(sign):
-                c += 1
-        return c
+            if t_sign != numpy.sign(sign):
+                err_count += 1
+                err_list.append((p, sign))
+        return err_count, err_list
 
     def perceptron_plot(self):
         if self._perceptron_count == 0:
+            position, _sign = self.current_dataset[0]
             self.org_x = sum(t[0]for t, s in self.current_dataset) / (self.iris_dataset.instances_num * 2)
             self.org_y = sum(t[1]for t, s in self.current_dataset) / (self.iris_dataset.instances_num * 2)
-            position, sign = self.current_dataset[0]
-            delta_x, delta_y = position[0] - self.org_x, position[1] - self.org_y
-            slope = - (delta_x) / (delta_y)
+            self.w_x, self.w_y = position[0] - self.org_x, position[1] - self.org_y
+            slope = - (self.w_x) / (self.w_y)
             self.axes.axline((self.org_x, self.org_y), slope=slope)
-            count = self.check_sign((delta_x, delta_y))
             self.draw()
+        else:
+            err_count, err_list = self.check_sign((self.w_x, self.w_y))
+            if err_count > 0:
+                self.axes.lines[-1].remove()
+                self.w_x, self.w_y = numpy.array(err_list[-1][0] - self.org_x, err_list[-1][1] - self.org_y) * err_list[-1][1] + numpy.array(self.w_x, self.w_y)
+                slope = - (self.w_x) / (self.w_y)
+                self.axes.axline((self.org_x, self.org_y), slope=slope)
+                self.draw()
         self._perceptron_count += 1
 
 class MainWindow(QtWidgets.QMainWindow):
