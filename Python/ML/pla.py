@@ -35,7 +35,9 @@ class MplCanvas(FigureCanvasQTAgg):
         self.marker_color = ['blue', 'green', 'red']
         self.select_class = []
         self.select_attr = ''
+        self.current_dataset = []
         self._perceptron_count = 0
+        self.org_x, self.org_y = 0, 0
         super(MplCanvas, self).__init__(fig)
 
     def iris_plot(self, iris_class, attr_name):
@@ -51,12 +53,33 @@ class MplCanvas(FigureCanvasQTAgg):
         length, width = self.iris_dataset.iris_scatter_dict[iris_class][attr_len], self.iris_dataset.iris_scatter_dict[iris_class][attr_width]
         self.axes.scatter(length, width, color=self.marker_color[1], marker='x', label=iris_class)
 
+        self.current_dataset = list(zip(self.iris_dataset.iris_dataset_dict[self.select_attr.lower()]['Setosa'], [1] * self.iris_dataset.instances_num))
+        self.current_dataset.extend(list(zip(self.iris_dataset.iris_dataset_dict[self.select_attr.lower()][iris_class], [-1] * self.iris_dataset.instances_num)))
+
         self.axes.set_xlabel(f'{self.select_attr} Length')
         self.axes.set_ylabel(f'{self.select_attr} Width')
         self.axes.legend()
         self.draw()
 
+    def check_sign(self, w):
+        c = 0
+        for p, sign in self.current_dataset:
+            t = (p[0] - self.org_x, p[1] - self.org_y)
+            t_sign = numpy.sign(numpy.dot(numpy.array(w), numpy.array(t)))
+            if t_sign == numpy.sign(sign):
+                c += 1
+        return c
+
     def perceptron_plot(self):
+        if self._perceptron_count == 0:
+            self.org_x = sum(t[0]for t, s in self.current_dataset) / (self.iris_dataset.instances_num * 2)
+            self.org_y = sum(t[1]for t, s in self.current_dataset) / (self.iris_dataset.instances_num * 2)
+            position, sign = self.current_dataset[0]
+            delta_x, delta_y = position[0] - self.org_x, position[1] - self.org_y
+            slope = - (delta_x) / (delta_y)
+            self.axes.axline((self.org_x, self.org_y), slope=slope)
+            count = self.check_sign((delta_x, delta_y))
+            self.draw()
         self._perceptron_count += 1
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -72,9 +95,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.actionIris_Sepel.triggered.connect(self.show_iris_sepel)
         self.ui.actionIris_Petal.triggered.connect(self.show_iris_petal)
+        self.ui.pushButton.clicked.connect(self.perceptron_button)
         self.ui.comboBox.addItems(self.sc.iris_dataset.iris_classes[1:3])
 
-        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Petal')
+        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Sepel')
         self.show()
 
     def show_iris_sepel(self):
@@ -82,6 +106,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def show_iris_petal(self):
         self.sc.iris_plot(self.ui.comboBox.currentText(), 'Petal')
+
+    def perceptron_button(self):
+        self.sc.perceptron_plot()
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
