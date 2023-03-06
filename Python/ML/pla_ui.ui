@@ -32,7 +32,7 @@
     <property name="geometry">
      <rect>
       <x>640</x>
-      <y>30</y>
+      <y>40</y>
       <width>101</width>
       <height>22</height>
      </rect>
@@ -42,7 +42,7 @@
     <property name="geometry">
      <rect>
       <x>640</x>
-      <y>80</y>
+      <y>140</y>
       <width>101</width>
       <height>23</height>
      </rect>
@@ -51,24 +51,19 @@
      <string>Perceptron</string>
     </property>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>753</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuSelect">
-    <property name="title">
-     <string>Select</string>
+   <widget class="QComboBox" name="comboBox_2">
+    <property name="enabled">
+     <bool>true</bool>
     </property>
-    <addaction name="actionIris_Sepel"/>
-    <addaction name="actionIris_Petal"/>
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>90</y>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
    </widget>
-   <addaction name="menuSelect"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionIris_Sepel">

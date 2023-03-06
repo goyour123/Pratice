@@ -13,6 +13,7 @@ from pla_ui import Ui_MainWindow
 class IrisDataset ():
     def __init__ (self):
         self.iris = datasets.load_iris()
+        self.iris_attrs = ['Sepel', 'Petal']
         self.iris_classes = ['Setosa', 'Versicolour', 'Virginica']
         self.instances_num = int(len(self.iris['data']) / len(self.iris_classes))
 
@@ -101,19 +102,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sc = MplCanvas(self, width=10, height=9, dpi=100)
         self.ui.verticalLayout.addWidget(self.sc)
 
-        self.ui.actionIris_Sepel.triggered.connect(self.show_iris_sepel)
-        self.ui.actionIris_Petal.triggered.connect(self.show_iris_petal)
         self.ui.pushButton.clicked.connect(self.perceptron_button)
         self.ui.comboBox.addItems(self.sc.iris_dataset.iris_classes[1:3])
+        self.ui.comboBox_2.addItems(self.sc.iris_dataset.iris_attrs)
+        self.ui.comboBox.currentTextChanged.connect(self.show_iris_plot)
+        self.ui.comboBox_2.currentTextChanged.connect(self.show_iris_plot)
 
-        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Sepel')
+        self.sc.iris_plot(self.ui.comboBox.currentText(), self.ui.comboBox_2.currentText())
         self.show()
 
-    def show_iris_sepel(self):
-        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Sepel')
-
-    def show_iris_petal(self):
-        self.sc.iris_plot(self.ui.comboBox.currentText(), 'Petal')
+    def show_iris_plot(self):
+        self.sc.iris_plot(self.ui.comboBox.currentText(), self.ui.comboBox_2.currentText())
 
     def perceptron_button(self):
         self.sc.perceptron_plot()
