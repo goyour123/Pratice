@@ -41,21 +41,24 @@ class MplCanvas(FigureCanvasQTAgg):
         self.org_x, self.org_y = 0, 0
         super(MplCanvas, self).__init__(fig)
 
-    def iris_plot(self, iris_class, attr_name):
+    def iris_plot(self, iris_classes, attr_name):
         self.axes.cla()
         self._perceptron_count = 0
-        self.select_class = ['Setosa', iris_class]
+        self.select_class = iris_classes
         self.select_attr = attr_name
 
         attr_len, attr_width = self.select_attr.lower() + '_len', self.select_attr.lower() + '_width'
-        length, width = self.iris_dataset.iris_scatter_dict['Setosa'][attr_len], self.iris_dataset.iris_scatter_dict['Setosa'][attr_width]
-        self.axes.scatter(length, width, color=self.marker_color[0], marker='x', label='Setosa')
+        
+        class_1 = iris_classes[0]
+        length, width = self.iris_dataset.iris_scatter_dict[class_1][attr_len], self.iris_dataset.iris_scatter_dict[class_1][attr_width]
+        self.axes.scatter(length, width, color=self.marker_color[0], marker='x', label=class_1)
 
-        length, width = self.iris_dataset.iris_scatter_dict[iris_class][attr_len], self.iris_dataset.iris_scatter_dict[iris_class][attr_width]
-        self.axes.scatter(length, width, color=self.marker_color[1], marker='x', label=iris_class)
+        class_2 = iris_classes[1]
+        length, width = self.iris_dataset.iris_scatter_dict[class_2][attr_len], self.iris_dataset.iris_scatter_dict[class_2][attr_width]
+        self.axes.scatter(length, width, color=self.marker_color[1], marker='x', label=class_2)
 
-        self.current_dataset = list(zip(self.iris_dataset.iris_dataset_dict[self.select_attr.lower()]['Setosa'], [1] * self.iris_dataset.instances_num))
-        self.current_dataset.extend(list(zip(self.iris_dataset.iris_dataset_dict[self.select_attr.lower()][iris_class], [-1] * self.iris_dataset.instances_num)))
+        self.current_dataset = list(zip(self.iris_dataset.iris_dataset_dict[self.select_attr.lower()][class_1], [1] * self.iris_dataset.instances_num))
+        self.current_dataset.extend(list(zip(self.iris_dataset.iris_dataset_dict[self.select_attr.lower()][class_2], [-1] * self.iris_dataset.instances_num)))
 
         self.axes.set_xlabel(f'{self.select_attr} Length')
         self.axes.set_ylabel(f'{self.select_attr} Width')
@@ -103,16 +106,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.verticalLayout.addWidget(self.sc)
 
         self.ui.pushButton.clicked.connect(self.perceptron_button)
-        self.ui.comboBox.addItems(self.sc.iris_dataset.iris_classes[1:3])
+        self.ui.comboBox.addItems(self.sc.iris_dataset.iris_classes)
+        self.ui.comboBox.setCurrentIndex(0)
         self.ui.comboBox_2.addItems(self.sc.iris_dataset.iris_attrs)
+        self.ui.comboBox_3.addItems(self.sc.iris_dataset.iris_classes)
+        self.ui.comboBox_3.setCurrentIndex(1)
         self.ui.comboBox.currentTextChanged.connect(self.show_iris_plot)
         self.ui.comboBox_2.currentTextChanged.connect(self.show_iris_plot)
+        self.ui.comboBox_3.currentTextChanged.connect(self.show_iris_plot)
 
-        self.sc.iris_plot(self.ui.comboBox.currentText(), self.ui.comboBox_2.currentText())
+        self.sc.iris_plot([self.ui.comboBox.currentText(), self.ui.comboBox_3.currentText()], self.ui.comboBox_2.currentText())
         self.show()
 
     def show_iris_plot(self):
-        self.sc.iris_plot(self.ui.comboBox.currentText(), self.ui.comboBox_2.currentText())
+        self.sc.iris_plot([self.ui.comboBox.currentText(), self.ui.comboBox_3.currentText()], self.ui.comboBox_2.currentText())
 
     def perceptron_button(self):
         self.sc.perceptron_plot()
