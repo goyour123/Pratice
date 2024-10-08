@@ -1,0 +1,26 @@
+
+$ nasm -f elf64 0x00.nasm
+$ ld 0x00.o -o test
+$ gdb test
+
+Display disassembly of next source line
+(gdb) set disassemble-next-line on
+
+Set breakpoint
+(gdb) b _start
+
+Run
+(gdb) run
+(gdb) r
+
+Continue
+(gdb) continue
+(gdb) c
+
+Step to next machine code command
+(gdb) stepi
+(gdb) si
+
+Display processor's registers
+(gdb) info registers
+(gdb) i r
