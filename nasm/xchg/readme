@@ -1,4 +1,7 @@
 
+Source from xchg rax, rax by xorpd@xorpd.net 
+
+Note:
 $ nasm -f elf64 0x00.nasm
 $ ld 0x00.o -o test
 $ gdb test
@@ -24,3 +27,6 @@ Step to next machine code command
 Display processor's registers
 (gdb) info registers
 (gdb) i r
+
+Set register value
+(gdb) set $rax = 0x1
